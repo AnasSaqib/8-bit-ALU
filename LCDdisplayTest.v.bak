@@ -1,0 +1,23 @@
+module LCDdisplayTest(	
+			CLK, reset_n, lcd_enable, lcd_bus, busy, rs, rw, e, lcd_data
+);
+input CLK;
+input reset_n;
+input lcd_enable;
+input lcd_bus;
+
+output busy;
+output rs, rw, e;
+output lcd_data;
+
+wire [9:0] lcd_bus;
+wire lcd_enable;
+reg busy;
+
+reg [7:0] lcd_data;
+reg rw=0;
+reg rs=0;
+reg e=0;
+
+reg [3:0] STATE=0;
+

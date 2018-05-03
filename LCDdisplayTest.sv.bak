@@ -1,0 +1,356 @@
+module LCDdisplayTest(	
+			CLK, reset_n, busy, rs, rw, e, lcd_data, data, key0, toleds, ledcheck, alustate
+);  
+input CLK;
+input reset_n;
+
+
+//input lcd_enable;   //not needed
+//input lcd_bus;  //not needed
+
+input key0;   //for ummie
+input [7:0] data; //for ummie
+
+output busy;
+output rs, rw, e;
+output lcd_data;
+
+output [7:0] toleds; //for ummie
+output ledcheck; //for ummie
+output [2:0] alustate; //for ummie
+
+//wire [9:0] lcd_bus;  //not needed 
+//wire lcd_enable; //not needed
+reg busy;
+
+
+
+reg [7:0] lcd_data;
+reg rw=0;
+reg rs=0;
+reg e=0;
+
+reg [2:0] STATE=0;
+
+integer clk_count=0;
+
+integer k;
+integer arraycount=0;
+reg [7:0] display_array[1:0] = '{8'h4f, 8'h4f};  //47
+
+//initial
+//begin
+	//for (k = 0; k < 50; k = k+1) begin
+		//display_array[k]=8'h4f;
+	//end
+	//display_array = '{8'h4f,8'h4f};
+//end
+
+////////////////
+
+
+ALU_8bit u1(
+.clk(CLK),
+.reset(reset_n),
+.key0(key0),
+.data(data),
+.ans(toleds),
+.ledcheck(ledcheck),
+.state(alustate)
+);
+
+
+
+
+always @(posedge CLK) begin
+
+	case(STATE)
+		0: begin   //power up
+			arraycount=0;
+			busy <= 1'b1;
+			if(clk_count<(50000*50)) begin     //50000*50
+				clk_count = clk_count + 1;
+				STATE=0;
+			end
+			else begin
+				clk_count=0;
+				rs <= 1'b0;
+				rw <= 1'b0;
+				lcd_data <= 8'b00110000;
+				STATE=1;
+			end
+		end 	
+		1: begin   //initialise
+			busy <= 1'b1;
+			clk_count = clk_count + 1;
+			if(clk_count<(10*50)) begin
+				lcd_data <= 8'b00110100;
+				e <= 1'b1;
+				STATE=1;
+			end
+			else if(clk_count<(60*50)) begin
+				lcd_data <= 8'b00000000;
+				e <= 1'b0;
+				STATE=1;	
+			end
+			else if(clk_count<(70*50)) begin
+				lcd_data <= 8'b00001110;
+				e <= 1'b1;
+				STATE=1;	
+			end
+			else if(clk_count<(120*50)) begin
+				lcd_data <= 8'b00000000;
+				e <= 1'b0;
+				STATE=1;	
+			end
+			else if(clk_count<(130*50)) begin
+				lcd_data <= 8'b00000001;
+				e <= 1'b1;
+				STATE=1;	
+			end
+			else if(clk_count<(2130*50)) begin
+				lcd_data <= 8'b00000000;
+				e <= 1'b0;
+				STATE=1;	
+			end
+			else if(clk_count<(2140*50)) begin
+				lcd_data <= 8'b00000110;
+				e <= 1'b1;
+				STATE=1;	
+			end
+			else if(clk_count<(2200*50)) begin
+				lcd_data <= 8'b00000000;
+				e <= 1'b0;
+				STATE=1;	
+			end
+			else begin
+				clk_count=0;
+				busy <= 1'b0;
+				STATE=2;
+			end 
+		end
+		2: begin //ready
+			
+			//if(lcd_enable==0) begin 
+			if(arraycount<4) begin	
+				busy <= 1'b1;
+				//rs <= lcd_bus[9:9];
+				//rw <= lcd_bus[8:8];
+				//lcd_data <= lcd_bus[7:0];
+				rs <= 1'b1;
+				rw <= 1'b0;
+				lcd_data <= display_array[arraycount];
+				arraycount = arraycount + 1;
+				
+				clk_count=0;
+				STATE=3;
+			end 
+			else begin
+				busy <= 1'b0;
+				rs <= 1'b0;
+				rw <= 1'b0;
+				lcd_data <= 8'b00000000;
+				clk_count=0;
+				STATE=2;
+			end 
+		end
+		3: begin  //send
+			busy <= 1'b1;
+			if(clk_count<50*50) begin        //#######clk_count<150000000    50*50
+				busy <= 1'b1;
+				if(clk_count<50) begin
+					e <= 1'b0;
+				end 
+				else if(clk_count<14*50) begin
+					e <= 1'b1;
+				end 
+				else if(clk_count<27*50) begin
+					e <= 1'b0;
+				end 
+				clk_count = clk_count + 1;
+				STATE=3;
+			end 
+			else begin
+				clk_count=0;
+				STATE = 2;
+			end
+		end 	
+	endcase
+	
+	if(reset_n == 0) begin
+		STATE = 0;
+	end 
+	
+	
+end
+
+
+
+endmodule
+
+
+
+//--------------------------------------
+//--------------------------------------
+module ALU_8bit (
+data   ,  // Data Input
+clk    ,  // Clock
+reset  ,  // Reset clock
+ans , // Final Answer
+key0   , // input toggle
+//clk_out,
+state,
+
+ledcheck
+);
+
+//-----------Input Ports---------------
+input [7:0] data       ;
+input clk, reset, key0 ; 
+
+//-----------Output Ports---------------
+
+output  [7:0] ans ; 
+//output clk_out;
+output state;
+
+output ledcheck;
+
+//------------Internal Variables--------	
+
+reg [2:0] state = 3'b000 ;
+reg [7:0] res   ; 
+reg [7:0] op1   ;
+reg [7:0] op2   ;
+reg [7:0] opc   ;
+reg [7:0] ans   = 8'b11111111;
+//reg [15:0] counter = 16'd0;
+reg done ;
+
+integer counter = 0;
+reg clk_out=1'b0;
+
+reg ledcheck=1'b0;
+
+//-------------Code Starts Here---------
+
+always @ (posedge clk_out)
+	if (reset == 0)
+		begin
+			state = 3'b000; 
+			op1 = 8'b00000000;
+			op2 = 8'b00000000;
+			opc = 8'b00000000;
+			res = 8'b00000000;
+			// show operation
+			ans = 8'b00000001 ;   ///
+		end 
+	else 
+		begin
+		case (state)
+			
+		3'b000 :
+			begin
+				if (key0 == 0) begin
+					opc = data;
+					state = 3'b001;
+					
+					ans = 8'b00000011 ;   ///
+
+				end
+				// show operation 
+			end
+			
+		3'b001 :
+			begin
+				if (key0 == 0) begin
+					op1 = data;
+					state = 3'b010;
+					
+					ans = 8'b00000111 ;   ///
+				end
+				// show operation 
+			end
+			
+		3'b010 :
+			begin
+				if (key0 == 0) begin
+					op2 = data;
+					state = 3'b011;
+					
+					ans = 8'b00001111 ;   ///
+				end
+				// show operation 
+			end
+			
+		3'b011 :
+			begin
+				ans = 8'b00011111 ;   ///
+				case(opc)
+
+					//arithmetic
+					8'b00000000 : res <= op1 + op2 ; 
+					8'b00000001	: res <= op1 - op2 ;
+					8'b00000010 : res <= op2 - op1 ;
+					8'b00000011 : res <= op1 * op2 ;
+					8'b00000100 : res <= op1 / op2 ;
+					8'b00000101 : res <= op2 / op1 ;
+					8'b00000110 : res <= op1 % op2 ;
+					8'b00000111 : res <= op2 % op1 ;
+						
+					//arithmetic shifts
+					8'b01101010 : res <= (op1 >>> op2[2:0]);
+					8'b11101011 : res <= (op1 <<< op2[2:0]);
+
+					// logical
+					8'b00010000 : res <= op1 & op2 ;
+					8'b00010001 : res <= op1 | op2 ;
+					8'b00010010 : res <= ~op1  ;
+					8'b00010011 : res <= ~op2 ;
+					8'b00010100 : res <= ~(op1 & op2) ; 
+					8'b00010101 : res <= ~(op1 | op2) ; 
+					8'b00010110 : res <= op1 ^ op2 ;  
+					8'b00010111 : res <= ~(op1 ^ op2) ; 
+						
+					// more rotates/shifts 
+					8'b00111000 : res <= ((op1 >> op2[2:0]) | (op1 << ((~op2[2:0]) + 3'b001 )));
+					8'b00111001 : res <= ((op1 << op2[2:0]) | (op1 >> ((~op2[2:0]) + 3'b001 )));
+					8'b01111010 : res <= (op1 >> op2[2:0]);
+					8'b11111011 : res <= (op1 << op2[2:0]);
+				
+					default : $display("Invalid ALU Operation - Try again Nigga");
+				endcase
+				state = 3'b100;
+			end
+				
+			3'b100 :
+				begin
+				//ans = 8'b00111111 ;   ///
+				ans = res;
+				if (key0 == 0) 
+					state = 3'b000;
+				
+				//show answer
+			end
+	
+		endcase
+	end
+		
+
+
+	always @ (posedge clk)	begin
+
+
+		if (counter == 25000000) begin 
+			ledcheck = ~ledcheck;
+			clk_out = ~clk_out;
+			counter = 0;
+		end 
+		else 
+			counter = counter + 1;
+
+			
+	end
+	
+endmodule
+ 
