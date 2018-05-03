@@ -1,0 +1,26 @@
+m255
+K3
+13
+cModel Technology
+Z0 dJ:\2017 Winter\Embedded Lab 1\LCDdisplayTest\simulation\modelsim
+vLCDdisplayTest
+!i10b 1
+!s100 ioeGOGFklJjRf4MSC]lRd1
+Ig?0[iE8;nYXZZY[o<8ofJ1
+Vm0aFPMa[FdR9OY_2jDV]90
+Z1 dJ:\2017 Winter\Embedded Lab 1\LCDdisplayTest\simulation\modelsim
+w1487897258
+8J:/2017 Winter/Embedded Lab 1/LCDdisplayTest/LCDdisplayTest.v
+FJ:/2017 Winter/Embedded Lab 1/LCDdisplayTest/LCDdisplayTest.v
+L0 1
+OV;L;10.1d;51
+r1
+!s85 0
+31
+!s108 1487897634.437000
+!s107 J:/2017 Winter/Embedded Lab 1/LCDdisplayTest/LCDdisplayTest.v|
+!s90 -reportprogress|300|-vlog01compat|-work|work|+incdir+J:/2017 Winter/Embedded Lab 1/LCDdisplayTest|J:/2017 Winter/Embedded Lab 1/LCDdisplayTest/LCDdisplayTest.v|
+!s101 -O0
+o-vlog01compat -work work -O0
+!s92 -vlog01compat -work work {+incdir+J:/2017 Winter/Embedded Lab 1/LCDdisplayTest} -O0
+n@l@c@ddisplay@test

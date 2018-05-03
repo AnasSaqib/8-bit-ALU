@@ -1,0 +1,38 @@
+# Reading C:/altera/13.0sp1/modelsim_ase/tcl/vsim/pref.tcl 
+# do LCDdisplayTest_run_msim_rtl_verilog.do 
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Copying C:\altera\13.0sp1\modelsim_ase\win32aloem/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# ** Warning: Copied C:\altera\13.0sp1\modelsim_ase\win32aloem/../modelsim.ini to modelsim.ini.
+#          Updated modelsim.ini.
+# 
+# vlog -vlog01compat -work work +incdir+J:/2017\ Winter/Embedded\ Lab\ 1/LCDdisplayTest {J:/2017 Winter/Embedded Lab 1/LCDdisplayTest/LCDdisplayTest.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module LCDdisplayTest
+# 
+# Top level modules:
+# 	LCDdisplayTest
+# 
+vsim +altera -do LCDdisplayTest_run_msim_rtl_verilog.do -l msim_transcript -gui work.LCDdisplayTest
+# vsim +altera -do LCDdisplayTest_run_msim_rtl_verilog.do -l msim_transcript -gui work.LCDdisplayTest 
+# Loading work.LCDdisplayTest
+# do LCDdisplayTest_run_msim_rtl_verilog.do 
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying modelsim.ini
+# 
+# vlog -vlog01compat -work work +incdir+J:/2017\ Winter/Embedded\ Lab\ 1/LCDdisplayTest {J:/2017 Winter/Embedded Lab 1/LCDdisplayTest/LCDdisplayTest.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module LCDdisplayTest
+# 
+# Top level modules:
+# 	LCDdisplayTest
+# 
+wave create -driver freeze -pattern clock -initialvalue 0 -period 20ns -dutycycle 50 -starttime 0ms -endtime 200ms sim:/LCDdisplayTest/CLK
